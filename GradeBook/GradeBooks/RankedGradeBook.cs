@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GradeBook.GradeBooks
@@ -17,7 +18,35 @@ namespace GradeBook.GradeBooks
                 throw new InvalidOperationException("Ranked-grading requires a minimum of 5 students.");
             }
 
-            return 'F';
+            // Get an ordered list of average grades.
+            var averageGrades = new List<double>();
+            foreach (var student in Students)
+            {
+                averageGrades.Add(student.AverageGrade);
+            }
+            averageGrades.OrderByDescending(x => x); 
+
+            // Determine which quintile averageGrade falls into based on the number of students.
+            var averageGradeRank = averageGrades.IndexOf(averageGrade) + 1; // Add 1 to account for zero indexing.
+            var rank = averageGradeRank / Students.Count();
+            double twentyPercent = (double)Students.Count() / 5;
+            twentyPercent = Math.Round(twentyPercent, 0);
+            var gradeGroup = Math.Ceiling(averageGradeRank / twentyPercent);
+
+            // Assign letter grade based on quintile.
+            switch (gradeGroup)
+            {
+                case 1:
+                    return 'A';
+                case 2:
+                    return 'B';
+                case 3:
+                    return 'C';
+                case 4:
+                    return 'D';
+                default:
+                    return 'F';
+            }
         }
     }
 }
